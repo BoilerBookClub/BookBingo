@@ -57,7 +57,7 @@ class BookBingo(commands.Cog):
 
         self.config.register_global(**default_global)
 
-    @commands.guild_only()
+    @commands.command()
     async def newcard(self, message):
         data = await self.config.data()
         goallist = data["goals"]
@@ -106,7 +106,7 @@ class BookBingo(commands.Cog):
         urllib.request.urlretrieve(url, fn)
         return fn
 
-    @commands.guild_only()
+    @commands.command()
     async def mycard(self, message):
         data = await self.config.data()
         if(not data["cards"][message.author.id]):
@@ -115,7 +115,7 @@ class BookBingo(commands.Cog):
         img = self.generate_image_online(userid=message.author.id)
         await self.send_file(message.channel, img)
 
-    @commands.guild_only()
+    @commands.command()
     async def mybooks(self, message):
         data = await self.config.data()
         if(not data["cards"][message.author.id]):
@@ -124,7 +124,7 @@ class BookBingo(commands.Cog):
         img = self.generate_image_online(userid=message.author.id, books=True)
         await self.send_file(message.channel, img)
 
-    @commands.guild_only()
+    @commands.command()
     async def complete(self, message):
         data = await self.config.data()
         if(not data["cards"][message.author.id]):
