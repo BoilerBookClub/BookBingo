@@ -2,7 +2,7 @@ from redbot.core import commands, Config
 import random
 import urllib.request
 
-class BookSearch(commands.Cog):
+class BookBingo(commands.Cog):
     """Allows users to run a Google Books search in inline text"""
 
     def __init__(self, bot):
