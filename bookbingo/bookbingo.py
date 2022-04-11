@@ -13,7 +13,7 @@ class BookBingo(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=3164112022)
+        self.config = Config.get_conf(self, identifier=1544112022)
 
         default_global = {
             "data": {
@@ -85,7 +85,7 @@ class BookBingo(commands.Cog):
         data["cards"][str(message.author.id)]["3"]["3"] = "!Free Space"
         await self.config.data.set(data)
         img = await self.makecard(str(message.author.id), data=data)
-        await message.channel.send(file=img)
+        await message.channel.send(content="Your Card:", file=img)
 
     def generate_image_online(self, userid, books=False, data=None):
         if(data == None):
@@ -121,7 +121,7 @@ class BookBingo(commands.Cog):
             await message.channel.send("You don't have a card yet!")
             return
         img = await self.makecard(userid=str(message.author.id), data=data)
-        await message.channel.send(file=img)
+        await message.channel.send(content="Your Card:", file=img)
 
     @commands.command()
     async def mybooks(self, message):
@@ -130,7 +130,7 @@ class BookBingo(commands.Cog):
             await message.channel.send("You don't have a card yet!")
             return
         img = await self.makecard(userid=str(message.author.id), books=True, data=data)
-        await message.channel.send(file=img)
+        await message.channel.send(content="Your Card:", file=img)
 
     @commands.command()
     async def complete(self, message):
