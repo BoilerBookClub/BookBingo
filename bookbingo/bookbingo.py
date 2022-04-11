@@ -85,7 +85,7 @@ class BookBingo(commands.Cog):
         data["cards"][str(message.author.id)]["3"]["3"] = "!Free Space"
         await self.config.data.set(data)
         img = await self.makecard(str(message.author.id), data=data)
-        await self.send_file(message.channel, img)
+        await message.channel.send(file=img)
 
     def generate_image_online(self, userid, books=False, data=None):
         if(data == None):
@@ -121,7 +121,7 @@ class BookBingo(commands.Cog):
             await message.channel.send("You don't have a card yet!")
             return
         img = await self.makecard(userid=str(message.author.id), data=data)
-        await self.send_file(message.channel, img)
+        await message.channel.send(file=img)
 
     @commands.command()
     async def mybooks(self, message):
@@ -130,7 +130,7 @@ class BookBingo(commands.Cog):
             await message.channel.send("You don't have a card yet!")
             return
         img = await self.makecard(userid=str(message.author.id), books=True, data=data)
-        await self.send_file(message.channel, img)
+        await message.channel.send(file=img)
 
     @commands.command()
     async def complete(self, message):
