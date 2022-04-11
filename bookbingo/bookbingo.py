@@ -1,6 +1,9 @@
 from redbot.core import commands, Config
 import random
 import urllib.request
+import os
+
+LATEX_TEMPLATE="template.tex"
 
 class BookBingo(commands.Cog):
     """Allows users to run a Google Books search in inline text"""
@@ -78,7 +81,7 @@ class BookBingo(commands.Cog):
                 data["cards"][str(message.author.id)][str(i)][str(j)] = selectedgoal
         data["cards"][str(message.author.id)]["3"]["3"] = "!Free Space"
         await self.config.data.set(data)
-        img = self.generate_image_online(str(message.author.id), data=data)
+        img = self.generate_image(str(message.author.id), data=data)
         await self.send_file(message.channel, img)
 
     def generate_image_online(self, userid, books=False, data=None):
@@ -114,7 +117,7 @@ class BookBingo(commands.Cog):
         if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
             return
-        img = self.generate_image_online(userid=str(message.author.id), data=data)
+        img = self.generate_image(userid=str(message.author.id), data=data)
         await self.send_file(message.channel, img)
 
     @commands.command()
@@ -123,7 +126,7 @@ class BookBingo(commands.Cog):
         if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
             return
-        img = self.generate_image_online(userid=str(message.author.id), books=True, data=data)
+        img = self.generate_image(userid=str(message.author.id), books=True, data=data)
         await self.send_file(message.channel, img)
 
     @commands.command()
@@ -155,3 +158,49 @@ class BookBingo(commands.Cog):
         data["cards"][str(message.author.id)] = carddata
         await self.config.data.set(data)
         await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)], message.content[message.content.find(".")+1:]))
+
+    def generate_image(self, userid, books=False, data=None):
+        if(data == None):
+            return
+        latex = "\\begin\{table\}[]\n\\begin\{tabular\}\{|l|l|l|l|l|\}\n\\hline\n"
+        carddata = data["cards"][userid]
+        for i in range(1,5):
+            for j in range(1,5):
+                add = carddata[str(i)][str(j)]
+                if(add.startswith("!")):
+                    add = add[1:]
+                    add = "\\color[HTML]\{32CB00\}" + add
+                if(add.find("|") != -1):
+                    if(books):
+                        add = add[add.find("|"):]
+                    else:
+                        add = add[:add.find("|")]
+                if(j != 5):
+                    latex += add + " & "
+                else:
+                    latex += add + "\\\\ \\hline\n"
+        latex += "\\end\{tabular\}\n\\end\{table\}"
+        name = str(random.randint(0, 2 ** 31))
+        latex_file = name + '.tex'
+        dvi_file = name + '.dvi'
+        png_file = name + '1.png'
+
+        with open(LATEX_TEMPLATE, 'r') as textemplatefile:
+            textemplate = textemplatefile.read()
+
+            with open(latex_file, 'w') as tex:
+                backgroundcolour = self.settings['latex']['background-colour']
+                textcolour = self.settings['latex']['text-colour']
+                latex = textemplate.replace('__DATA__', latex).replace('__BGCOLOUR__', backgroundcolour).replace('__TEXTCOLOUR__', textcolour)
+
+                tex.write(latex)
+                tex.flush()
+                tex.close()
+
+        imagedpi = self.settings['latex']['dpi']
+        latexsuccess = os.system('latex -quiet -interaction=nonstopmode ' + latex_file)
+        if latexsuccess == 0:
+            os.system('dvipng -q* -D {0} -T tight '.format(imagedpi) + dvi_file)
+            return png_file
+        else:
+            return ''
