@@ -1,7 +1,10 @@
 from redbot.core import commands, Config
 import random
 import urllib.request
+import urllib.parse as parse
 import os
+from PIL import Image, ImageOps
+import io
 
 LATEX_TEMPLATE="template.tex"
 
@@ -81,7 +84,7 @@ class BookBingo(commands.Cog):
                 data["cards"][str(message.author.id)][str(i)][str(j)] = selectedgoal
         data["cards"][str(message.author.id)]["3"]["3"] = "!Free Space"
         await self.config.data.set(data)
-        img = self.generate_image(str(message.author.id), data=data)
+        img = await self.makecard(str(message.author.id), data=data)
         await self.send_file(message.channel, img)
 
     def generate_image_online(self, userid, books=False, data=None):
@@ -117,7 +120,7 @@ class BookBingo(commands.Cog):
         if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
             return
-        img = self.generate_image(userid=str(message.author.id), data=data)
+        img = await self.makecard(userid=str(message.author.id), data=data)
         await self.send_file(message.channel, img)
 
     @commands.command()
@@ -126,7 +129,7 @@ class BookBingo(commands.Cog):
         if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
             return
-        img = self.generate_image(userid=str(message.author.id), books=True, data=data)
+        img = await self.makecard(userid=str(message.author.id), books=True, data=data)
         await self.send_file(message.channel, img)
 
     @commands.command()
@@ -204,3 +207,44 @@ class BookBingo(commands.Cog):
             return png_file
         else:
             return ''
+
+    async def makecard(self, userid, books=False, data=None):
+        if(data == None):
+            return
+        latex = "\\begin\{table\}[]\n\\begin\{tabular\}\{|l|l|l|l|l|\}\n\\hline\n"
+        carddata = data["cards"][userid]
+        for i in range(1,5):
+            for j in range(1,5):
+                add = carddata[str(i)][str(j)]
+                if(add.startswith("!")):
+                    add = add[1:]
+                    add = "\\color[HTML]\{32CB00\}" + add
+                if(add.find("|") != -1):
+                    if(books):
+                        add = add[add.find("|"):]
+                    else:
+                        add = add[:add.find("|")]
+                if(j != 5):
+                    latex += add + " & "
+                else:
+                    latex += add + "\\\\ \\hline\n"
+        latex += "\\end\{tabular\}\n\\end\{table\}"
+        base_url = "https://latex.codecogs.com/gif.latex?%5Cbg_white%20%5CLARGE%20"
+        equation = parse.quote(latex)
+        url = f"{base_url}{equation}"
+
+        try:
+            async with self.session.get(url) as r:
+                image = await r.read()
+            image = Image.open(io.BytesIO(image)).convert("RGBA")
+        except Exception as exc:
+            image = None
+
+        if not image:
+            return
+
+        image = ImageOps.expand(image, border=10, fill="white")
+        image_file_object = io.BytesIO()
+        image.save(image_file_object, format="png")
+        image_file_object.seek(0)
+        return image_file_object
