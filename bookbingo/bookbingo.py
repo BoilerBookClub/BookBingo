@@ -78,12 +78,13 @@ class BookBingo(commands.Cog):
                 data["cards"][str(message.author.id)][str(i)][str(j)] = selectedgoal
         data["cards"][str(message.author.id)]["3"]["3"] = "!Free Space"
         await self.config.data.set(data)
-        img = self.generate_image_online(str(message.author.id))
+        img = self.generate_image_online(str(message.author.id), data=data)
         await self.send_file(message.channel, img)
 
-    def generate_image_online(self, userid, books=False):
+    def generate_image_online(self, userid, books=False, data=None):
+        if(data == None):
+            return
         latex = "\\begin\{table\}[]\n\\begin\{tabular\}\{|l|l|l|l|l|\}\n\\hline\n"
-        data = self.config.data()
         carddata = data["cards"][userid]
         for i in range(1,5):
             for j in range(1,5):
@@ -113,7 +114,7 @@ class BookBingo(commands.Cog):
         if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
             return
-        img = self.generate_image_online(userid=str(message.author.id))
+        img = self.generate_image_online(userid=str(message.author.id), data=data)
         await self.send_file(message.channel, img)
 
     @commands.command()
@@ -122,7 +123,7 @@ class BookBingo(commands.Cog):
         if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
             return
-        img = self.generate_image_online(userid=str(message.author.id), books=True)
+        img = self.generate_image_online(userid=str(message.author.id), books=True, data=data)
         await self.send_file(message.channel, img)
 
     @commands.command()
