@@ -61,7 +61,7 @@ class BookBingo(commands.Cog):
     async def newcard(self, message):
         data = await self.config.data()
         goallist = data["goals"]
-        if(data["cards"][str(message.author.id)]):
+        if(str(message.author.id) in data["cards"]):
             await message.channel.send("You already have a card!")
             return
         data["cards"][str(message.author.id)] = {
