@@ -77,7 +77,7 @@ class BookBingo(commands.Cog):
                 goallist.remove(selectedgoal)
                 data["cards"][str(message.author.id)][str(i)][str(j)] = selectedgoal
         data["cards"][str(message.author.id)]["3"]["3"] = "!Free Space"
-        await self.config.set("data", data)
+        await self.config.data.set(data)
         img = self.generate_image_online(str(message.author.id))
         await self.send_file(message.channel, img)
 
@@ -151,5 +151,5 @@ class BookBingo(commands.Cog):
             return
         carddata[str(trow)][str(tcol)] = "!" + carddata[str(trow)][str(tcol)] + "|" + message.content[message.content.find(".")+1:]
         data["cards"][str(message.author.id)] = carddata
-        await self.config.set("data", data)
+        await self.config.data.set(data)
         await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)], message.content[message.content.find(".")+1:]))
