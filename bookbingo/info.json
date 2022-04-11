@@ -2,4 +2,25 @@
     "author" : [
         "Matt Headley"
     ],
-    "description" : "A bingo extension for the Boiler Book Club",
+    "description" : "A bingo cog for the Boiler Book Club.",
+    "disabled" : false,
+    "end_user_data_statement" : "This cog stores no data beyond what it is given.",
+    "hidden" : false,
+    "install_msg" : "This is an install message.",
+    "max_bot_version" : "0.0.0",
+    "min_bot_version" : "3.1.8",
+    "min_python_version" : [
+        3,
+        7,
+        2
+    ],
+    "name" : "BookBingo",
+    "permissions" : [
+        "attach_files"
+    ],
+    "required_cogs" : {},
+    "requirements" : [],
+    "short" : "Books and Bingo.",
+    "tags" : [],
+    "type" : "COG"
+}
