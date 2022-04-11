@@ -61,10 +61,10 @@ class BookBingo(commands.Cog):
     async def newcard(self, message):
         data = await self.config.data()
         goallist = data["goals"]
-        if(data["cards"][message.author.id]):
+        if(data["cards"][str(message.author.id)]):
             await message.channel.send("You already have a card!")
             return
-        data["cards"][message.author.id] = {
+        data["cards"][str(message.author.id)] = {
             "1": {"1":"", "2":"", "3":"", "4":"", "5":""},
             "2": {"1":"", "2":"", "3":"", "4":"", "5":""},
             "3": {"1":"", "2":"", "3":"", "4":"", "5":""},
@@ -75,10 +75,10 @@ class BookBingo(commands.Cog):
             for j in range(1,5):
                 selectedgoal = goallist[random.randint(0, len(goallist)-1)]
                 goallist.remove(selectedgoal)
-                data["cards"][message.author.id][str(i)][str(j)] = selectedgoal
-        data["cards"][message.author.id]["3"]["3"] = "!Free Space"
+                data["cards"][str(message.author.id)][str(i)][str(j)] = selectedgoal
+        data["cards"][str(message.author.id)]["3"]["3"] = "!Free Space"
         await self.config.set("data", data)
-        img = self.generate_image_online(message.author.id)
+        img = self.generate_image_online(str(message.author.id))
         await self.send_file(message.channel, img)
 
     def generate_image_online(self, userid, books=False):
@@ -109,28 +109,28 @@ class BookBingo(commands.Cog):
     @commands.command()
     async def mycard(self, message):
         data = await self.config.data()
-        if(not data["cards"][message.author.id]):
+        if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
             return
-        img = self.generate_image_online(userid=message.author.id)
+        img = self.generate_image_online(userid=str(message.author.id))
         await self.send_file(message.channel, img)
 
     @commands.command()
     async def mybooks(self, message):
         data = await self.config.data()
-        if(not data["cards"][message.author.id]):
+        if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
             return
-        img = self.generate_image_online(userid=message.author.id, books=True)
+        img = self.generate_image_online(userid=str(message.author.id), books=True)
         await self.send_file(message.channel, img)
 
     @commands.command()
     async def complete(self, message):
         data = await self.config.data()
-        if(not data["cards"][message.author.id]):
+        if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
             return
-        carddata = data["cards"][message.author.id]
+        carddata = data["cards"][str(message.author.id)]
         if(message.content.find(".") == -1):
             await message.channel.send("Invalid solution format!")
             return
@@ -150,6 +150,6 @@ class BookBingo(commands.Cog):
             await message.channel.send("You already claimed this space!")
             return
         carddata[str(trow)][str(tcol)] = "!" + carddata[str(trow)][str(tcol)] + "|" + message.content[message.content.find(".")+1:]
-        data["cards"][message.author.id] = carddata
+        data["cards"][str(message.author.id)] = carddata
         await self.config.set("data", data)
         await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)], message.content[message.content.find(".")+1:]))
