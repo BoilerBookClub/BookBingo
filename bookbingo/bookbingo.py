@@ -7,7 +7,7 @@ class BookBingo(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1174112022)
+        self.config = Config.get_conf(self, identifier=3164112022)
 
         default_global = {
             "data": {
@@ -20,7 +20,7 @@ class BookBingo(commands.Cog):
                         "5": {"1":"", "2":"", "3":"", "4":"", "5":""}
                     }
                 },
-                "goals": {
+                "goals": [
                     "Any Romance",
                     "Any Sci-Fi",
                     "Any Fantasy",
@@ -51,7 +51,7 @@ class BookBingo(commands.Cog):
                     "A book that won the Newberry Medal",
                     "A book that won the Pulitzer",
                     "A Book Club Book Of The Month"
-                }
+                ]
             }
         }
 
