@@ -83,7 +83,8 @@ class BookBingo(commands.Cog):
 
     def generate_image_online(self, userid, books=False):
         latex = "\\begin\{table\}[]\n\\begin\{tabular\}\{|l|l|l|l|l|\}\n\\hline\n"
-        carddata = self.config.data()["cards"][userid]
+        data = self.config.data()
+        carddata = data["cards"][userid]
         for i in range(1,5):
             for j in range(1,5):
                 add = carddata[str(i)][str(j)]
