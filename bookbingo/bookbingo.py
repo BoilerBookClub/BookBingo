@@ -146,7 +146,7 @@ class BookBingo(commands.Cog):
         carddata[str(trow)][str(tcol)] = "!" + carddata[str(trow)][str(tcol)] + "|" + arg[arg.find(".")+1:]
         data["cards"][str(message.author.id)] = carddata
         await self.config.data.set(data)
-        await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)][:carddata[str(trow)][str(tcol)].find("|")].lstrip(), arg[arg.find(".")+1:].lstrip()))
+        await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)][:carddata[str(trow)][str(tcol)]][1:], arg[arg.find(".")+1:].lstrip()))
 
     async def makecard(self, userid, books=False, data=None):
         if(data == None):
