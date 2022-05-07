@@ -75,8 +75,8 @@ class BookBingo(commands.Cog):
             "4": {"1":"", "2":"", "3":"", "4":"", "5":""},
             "5": {"1":"", "2":"", "3":"", "4":"", "5":""}
         }
-        for i in range(1,5):
-            for j in range(1,5):
+        for i in range(1,6):
+            for j in range(1,6):
                 selectedgoal = goallist[random.randint(0, len(goallist)-1)]
                 goallist.remove(selectedgoal)
                 data["cards"][str(message.author.id)][str(i)][str(j)] = selectedgoal
@@ -119,8 +119,8 @@ class BookBingo(commands.Cog):
         objhalf = message.content[:message.content.find(".")].lower()
         tcol = 0
         trow = 0
-        for i in range(1,5):
-            for j in range(1,5):
+        for i in range(1,6):
+            for j in range(1,6):
                 if(carddata[str(i)][str(j)].lower().find(objhalf) != -1):
                     tcol = j
                     trow = i
@@ -146,8 +146,8 @@ class BookBingo(commands.Cog):
         for l in range(1, 5):
             d.line(((l*200, 0), (l*200), 1000), fill='black', width=10)
             d.line(((0, l*200),  (1000, l*200)), fill='black', width=10)
-        for i in range(0, 5):
-            for j in range(0,5):
+        for i in range(1, 6):
+            for j in range(1,6):
                 done = False
                 temp = carddata[str(i)][str(j)]
                 if(temp.startswith("!")):
