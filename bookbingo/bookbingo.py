@@ -142,7 +142,7 @@ class BookBingo(commands.Cog):
         carddata = data["cards"][userid]
         img = Image.new('RGB', (1000, 1000), color='white')
         d = ImageDraw.Draw(img)
-        font = ImageFont.truetype("Roboto-Regular.ttf", 20)
+        font = ImageFont.truetype("NotoMono-Regular.ttf", 20)
         for l in range(1, 5):
             d.line(((l*200, 0), (l*200), 1000), fill='black', width=10)
             d.line(((0, l*200),  (1000, l*200)), fill='black', width=10)
