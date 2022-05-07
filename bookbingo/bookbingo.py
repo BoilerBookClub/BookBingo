@@ -1,15 +1,13 @@
 from redbot.core import commands, Config
 import random
-import urllib.request
-import urllib.parse as parse
-import os
-from PIL import Image, ImageOps
-import io
+from PIL import Image, ImageDraw, ImageFont
+import random
+import asyncio
+import discord
 
-LATEX_TEMPLATE="template.tex"
 
 class BookBingo(commands.Cog):
-    """Allows users to run a Google Books search in inline text"""
+    """The Bingo Class"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -85,34 +83,8 @@ class BookBingo(commands.Cog):
         data["cards"][str(message.author.id)]["3"]["3"] = "!Free Space"
         await self.config.data.set(data)
         img = await self.makecard(str(message.author.id), data=data)
-        await message.channel.send(content="Your Card:", file=img)
-
-    def generate_image_online(self, userid, books=False, data=None):
-        if(data == None):
-            return
-        latex = "\\begin\{table\}[]\n\\begin\{tabular\}\{|l|l|l|l|l|\}\n\\hline\n"
-        carddata = data["cards"][userid]
-        for i in range(1,5):
-            for j in range(1,5):
-                add = carddata[str(i)][str(j)]
-                if(add.startswith("!")):
-                    add = add[1:]
-                    add = "\\color[HTML]\{32CB00\}" + add
-                if(add.find("|") != -1):
-                    if(books):
-                        add = add[add.find("|"):]
-                    else:
-                        add = add[:add.find("|")]
-                if(j != 5):
-                    latex += add + " & "
-                else:
-                    latex += add + "\\\\ \\hline\n"
-        latex += "\\end\{tabular\}\n\\end\{table\}"
-        url = 'http://frog.isima.fr/cgi-bin/bruno/tex2png--10.cgi?'
-        url += urllib.parse.quote(latex, safe='')
-        fn = str(random.randint(0, 2 ** 31)) + '.png'
-        urllib.request.urlretrieve(url, fn)
-        return fn
+        img.save("bingo.png")
+        await message.channel.send(content="Your Card:", file=discord.File("bingo.png"))
 
     @commands.command()
     async def mycard(self, message):
@@ -121,7 +93,8 @@ class BookBingo(commands.Cog):
             await message.channel.send("You don't have a card yet!")
             return
         img = await self.makecard(userid=str(message.author.id), data=data)
-        await message.channel.send(content="Your Card:", file=img)
+        img.save("bingo.png")
+        await message.channel.send(content="Your Card:", file=discord.File("bingo.png"))
 
     @commands.command()
     async def mybooks(self, message):
@@ -130,7 +103,8 @@ class BookBingo(commands.Cog):
             await message.channel.send("You don't have a card yet!")
             return
         img = await self.makecard(userid=str(message.author.id), books=True, data=data)
-        await message.channel.send(content="Your Card:", file=img)
+        img.save("bingo.png")
+        await message.channel.send(content="Your Card:", file=discord.File("bingo.png"))
 
     @commands.command()
     async def complete(self, message):
@@ -162,89 +136,38 @@ class BookBingo(commands.Cog):
         await self.config.data.set(data)
         await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)], message.content[message.content.find(".")+1:]))
 
-    def generate_image(self, userid, books=False, data=None):
-        if(data == None):
-            return
-        latex = "\\begin\{table\}[]\n\\begin\{tabular\}\{|l|l|l|l|l|\}\n\\hline\n"
-        carddata = data["cards"][userid]
-        for i in range(1,5):
-            for j in range(1,5):
-                add = carddata[str(i)][str(j)]
-                if(add.startswith("!")):
-                    add = add[1:]
-                    add = "\\color[HTML]\{32CB00\}" + add
-                if(add.find("|") != -1):
-                    if(books):
-                        add = add[add.find("|"):]
-                    else:
-                        add = add[:add.find("|")]
-                if(j != 5):
-                    latex += add + " & "
-                else:
-                    latex += add + "\\\\ \\hline\n"
-        latex += "\\end\{tabular\}\n\\end\{table\}"
-        name = str(random.randint(0, 2 ** 31))
-        latex_file = name + '.tex'
-        dvi_file = name + '.dvi'
-        png_file = name + '1.png'
-
-        with open(LATEX_TEMPLATE, 'r') as textemplatefile:
-            textemplate = textemplatefile.read()
-
-            with open(latex_file, 'w') as tex:
-                backgroundcolour = self.settings['latex']['background-colour']
-                textcolour = self.settings['latex']['text-colour']
-                latex = textemplate.replace('__DATA__', latex).replace('__BGCOLOUR__', backgroundcolour).replace('__TEXTCOLOUR__', textcolour)
-
-                tex.write(latex)
-                tex.flush()
-                tex.close()
-
-        imagedpi = self.settings['latex']['dpi']
-        latexsuccess = os.system('latex -quiet -interaction=nonstopmode ' + latex_file)
-        if latexsuccess == 0:
-            os.system('dvipng -q* -D {0} -T tight '.format(imagedpi) + dvi_file)
-            return png_file
-        else:
-            return ''
-
     async def makecard(self, userid, books=False, data=None):
         if(data == None):
             return
-        latex = "\\begin\{table\}[]\n\\begin\{tabular\}\{|l|l|l|l|l|\}\n\\hline\n"
         carddata = data["cards"][userid]
-        for i in range(1,5):
-            for j in range(1,5):
-                add = carddata[str(i)][str(j)]
-                if(add.startswith("!")):
-                    add = add[1:]
-                    add = "\\color[HTML]\{32CB00\}" + add
-                if(add.find("|") != -1):
+        img = Image.new('RGB', (1000, 1000), color='white')
+        d = ImageDraw.Draw(img)
+        font = ImageFont.truetype("Roboto-Regular.ttf", 20)
+        for l in range(1, 5):
+            d.line(((l*200, 0), (l*200), 1000), fill='black', width=10)
+            d.line(((0, l*200),  (1000, l*200)), fill='black', width=10)
+        for i in range(0, 5):
+            for j in range(0,5):
+                done = False
+                temp = carddata[str(i)][str(j)]
+                if(temp.startswith("!")):
+                    temp = temp[1:]
+                    done = True
+                if(temp.find("|") != -1):
                     if(books):
-                        add = add[add.find("|"):]
+                        temp = temp[temp.find("|"):]
                     else:
-                        add = add[:add.find("|")]
-                if(j != 5):
-                    latex += add + " & "
+                        temp = temp[:temp.find("|")]
+                tempList = temp.split()
+                temp = ""
+                for k in range(0, len(tempList)):
+                    if (k % 2 == 1):
+                        temp += tempList[k] + "\n"
+                    else:
+                        temp += tempList[k] + " "
+                if(done):
+                    d.text(((i*200)+5, (j*200)+5), text=temp, fill='green', font=font)
                 else:
-                    latex += add + "\\\\ \\hline\n"
-        latex += "\\end\{tabular\}\n\\end\{table\}"
-        base_url = "https://latex.codecogs.com/gif.latex?%5Cbg_white%20%5CLARGE%20"
-        equation = parse.quote(latex)
-        url = f"{base_url}{equation}"
+                    d.text(((i*200)+5, (j*200)+5), text=temp, fill='black', font=font)
+        return img
 
-        try:
-            async with self.session.get(url) as r:
-                image = await r.read()
-            image = Image.open(io.BytesIO(image)).convert("RGBA")
-        except Exception as exc:
-            image = None
-
-        if not image:
-            return
-
-        image = ImageOps.expand(image, border=10, fill="white")
-        image_file_object = io.BytesIO()
-        image.save(image_file_object, format="png")
-        image_file_object.seek(0)
-        return image_file_object
