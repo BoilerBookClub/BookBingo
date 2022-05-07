@@ -146,7 +146,7 @@ class BookBingo(commands.Cog):
         carddata[str(trow)][str(tcol)] = "!" + carddata[str(trow)][str(tcol)] + "|" + arg[arg.find(".")+1:]
         data["cards"][str(message.author.id)] = carddata
         await self.config.data.set(data)
-        await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)][carddata[str(trow)][str(tcol)].find("|"):].lstrip(), arg[arg.find(".")+1:].lstrip()))
+        await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)][:carddata[str(trow)][str(tcol)].find("|")].lstrip(), arg[arg.find(".")+1:].lstrip()))
 
     async def makecard(self, userid, books=False, data=None):
         if(data == None):
@@ -167,7 +167,7 @@ class BookBingo(commands.Cog):
                     done = True
                 if(temp.find("|") != -1):
                     if(books):
-                        temp = temp[temp.find("|"):]
+                        temp = temp[temp.find("|")+1:].lstrip()
                     else:
                         temp = temp[:temp.find("|")]
                 tempList = temp.split()
@@ -178,8 +178,8 @@ class BookBingo(commands.Cog):
                     else:
                         temp += tempList[k] + " "
                 if(done):
-                    d.text(((i*200)-195, (j*200)-190), text=temp, fill='green', font=font)
+                    d.text(((i*200)-190, (j*200)-195), text=temp, fill='green', font=font)
                 else:
-                    d.text(((i*200)-195, (j*200)-190), text=temp, fill='black', font=font)
+                    d.text(((i*200)-190, (j*200)-195), text=temp, fill='black', font=font)
         return img
 
