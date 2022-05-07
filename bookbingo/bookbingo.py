@@ -119,16 +119,16 @@ class BookBingo(commands.Cog):
         await message.channel.send(content="Your Card:", file=discord.File("bingo.png"))
 
     @commands.command()
-    async def complete(self, message):
+    async def complete(self, message, *, arg):
         data = await self.config.data()
         if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
             return
         carddata = data["cards"][str(message.author.id)]
-        if(message.message.content.find(".") == -1):
+        if(arg.find(".") == -1):
             await message.channel.send("Invalid solution format!")
             return
-        objhalf = message.message.content[:message.message.content.find(".")].lower()
+        objhalf = arg[:arg.find(".")].lower()
         tcol = 0
         trow = 0
         for i in range(1,6):
@@ -143,10 +143,10 @@ class BookBingo(commands.Cog):
         if(carddata[str(trow)][str(tcol)].startswith("!")):
             await message.channel.send("You already claimed this space!")
             return
-        carddata[str(trow)][str(tcol)] = "!" + carddata[str(trow)][str(tcol)] + "|" + message.message.content[message.message.content.find(".")+1:]
+        carddata[str(trow)][str(tcol)] = "!" + carddata[str(trow)][str(tcol)] + "|" + arg[arg.find(".")+1:]
         data["cards"][str(message.author.id)] = carddata
         await self.config.data.set(data)
-        await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)], message.message.content[message.message.content.find(".")+1:]))
+        await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)], arg[arg.find(".")+1:]))
 
     async def makecard(self, userid, books=False, data=None):
         if(data == None):
