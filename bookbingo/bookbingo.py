@@ -43,17 +43,17 @@ class BookBingo(commands.Cog):
                     "Any YA book",
                     "Any Comedy",
                     "Any Classic",
-                    "Any Stage/Screenplay",
-                    "A book about military/war/politics",
+                    "Any Script or Screenplay",
+                    "A book about the military, war, or politics",
                     "A book with people on the cover",
                     "A book about art",
                     "A book about music",
                     "A New York Times Bestseller",
                     "A book with a pretty cover",
                     "A book set in a dystopia",
-                    "A book with less than 3 stars on Amazon/Goodreads",
+                    "A book with less than 3 stars on Amazon or Goodreads",
                     "A book that won the Newberry Medal",
-                    "A book that won the Pulitzer",
+                    "A book that won the Pulitzer Prize",
                     "A Book Club Book Of The Month"
                 ]
             }
@@ -85,6 +85,17 @@ class BookBingo(commands.Cog):
         img = await self.makecard(str(message.author.id), data=data)
         img.save("bingo.png")
         await message.channel.send(content="Your Card:", file=discord.File("bingo.png"))
+
+    @commands.command()
+    async def debugdumpdict(self, message):
+        data = await self.config.data()
+        await message.channel.send(str(data))
+
+    @commands.command()
+    async def debugdumpcard(self, message):
+        data = await self.config.data()
+        del data["cards"][str(message.author.id)]
+        await message.channel.send("Deleted card!")
 
     @commands.command()
     async def mycard(self, message):
