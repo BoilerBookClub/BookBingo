@@ -64,6 +64,9 @@ class BookBingo(commands.Cog):
 
     @commands.command()
     async def newcard(self, message):
+        if(message.channel.id != 972604858693726320):
+            await message.channel.send("You can only use this command in the #summer-bingo channel!")
+            return
         data = await self.config.data()
         goallist = deepcopy(data["goals"])
         if(str(message.author.id) in data["cards"]):
@@ -100,6 +103,9 @@ class BookBingo(commands.Cog):
 
     @commands.command()
     async def mycard(self, message):
+        if(message.channel.id != 972604858693726320):
+            await message.channel.send("You can only use this command in the #summer-bingo channel!")
+            return
         data = await self.config.data()
         if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
@@ -110,6 +116,9 @@ class BookBingo(commands.Cog):
 
     @commands.command()
     async def mybooks(self, message):
+        if(message.channel.id != 972604858693726320):
+            await message.channel.send("You can only use this command in the #summer-bingo channel!")
+            return
         data = await self.config.data()
         if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
@@ -119,7 +128,14 @@ class BookBingo(commands.Cog):
         await message.channel.send(content="Your Card:", file=discord.File("bingo.png"))
 
     @commands.command()
+    async def bingohelp(self, message):
+        await message.channel.send("Commands:\n\n -mycard: Shows your card\n -mybooks: Shows your card with your books\n -newcard: Creates a new card\n -complete: Claims a square on your card with a certain book, in the format: !complete <word in targeted square>.<book name>")
+
+    @commands.command()
     async def complete(self, message, *, arg):
+        if(message.channel.id != 972604858693726320):
+            await message.channel.send("You can only use this command in the #summer-bingo channel!")
+            return
         data = await self.config.data()
         if(str(message.author.id) not in data["cards"]):
             await message.channel.send("You don't have a card yet!")
