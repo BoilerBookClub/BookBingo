@@ -12,7 +12,7 @@ class BookBingo(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234572022)
+        self.config = Config.get_conf(self, identifier=1244572022)
 
         default_global = {
             "data": {
@@ -125,10 +125,10 @@ class BookBingo(commands.Cog):
             await message.channel.send("You don't have a card yet!")
             return
         carddata = data["cards"][str(message.author.id)]
-        if(message.content.find(".") == -1):
+        if(message.message.content.find(".") == -1):
             await message.channel.send("Invalid solution format!")
             return
-        objhalf = message.content[:message.content.find(".")].lower()
+        objhalf = message.message.content[:message.message.content.find(".")].lower()
         tcol = 0
         trow = 0
         for i in range(1,6):
@@ -143,10 +143,10 @@ class BookBingo(commands.Cog):
         if(carddata[str(trow)][str(tcol)].startswith("!")):
             await message.channel.send("You already claimed this space!")
             return
-        carddata[str(trow)][str(tcol)] = "!" + carddata[str(trow)][str(tcol)] + "|" + message.content[message.content.find(".")+1:]
+        carddata[str(trow)][str(tcol)] = "!" + carddata[str(trow)][str(tcol)] + "|" + message.message.content[message.message.content.find(".")+1:]
         data["cards"][str(message.author.id)] = carddata
         await self.config.data.set(data)
-        await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)], message.content[message.content.find(".")+1:]))
+        await message.channel.send("You have claimed the space {0} with the book {1}!".format(carddata[str(trow)][str(tcol)], message.message.content[message.message.content.find(".")+1:]))
 
     async def makecard(self, userid, books=False, data=None):
         if(data == None):
