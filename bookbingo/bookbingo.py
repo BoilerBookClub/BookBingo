@@ -11,7 +11,7 @@ class BookBingo(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1544112022)
+        self.config = Config.get_conf(self, identifier=1234572022)
 
         default_global = {
             "data": {
