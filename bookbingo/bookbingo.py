@@ -4,6 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 import random
 import asyncio
 import discord
+from copy import deepcopy
 
 
 class BookBingo(commands.Cog):
@@ -64,7 +65,7 @@ class BookBingo(commands.Cog):
     @commands.command()
     async def newcard(self, message):
         data = await self.config.data()
-        goallist = data["goals"]
+        goallist = deepcopy(data["goals"])
         if(str(message.author.id) in data["cards"]):
             await message.channel.send("You already have a card!")
             return
@@ -177,8 +178,8 @@ class BookBingo(commands.Cog):
                     else:
                         temp += tempList[k] + " "
                 if(done):
-                    d.text(((i*200)+5, (j*200)+5), text=temp, fill='green', font=font)
+                    d.text(((i*200)-195, (j*200)-195), text=temp, fill='green', font=font)
                 else:
-                    d.text(((i*200)+5, (j*200)+5), text=temp, fill='black', font=font)
+                    d.text(((i*200)-195, (j*200)-195), text=temp, fill='black', font=font)
         return img
 
